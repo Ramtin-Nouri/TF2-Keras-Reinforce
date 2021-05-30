@@ -22,9 +22,9 @@ class NeuralNetwork(nnBase.NNBase):
         model.add(Conv2D(32, (3, 3), activation='relu',padding='same'))
         model.add((MaxPooling2D(2,2)))
         model.add(Conv2D(64, (3, 3), activation='relu',padding='same'))
-        model.add(Dropout(0.1))
         model.add((MaxPooling2D(2,2)))
         model.add(Flatten())
+        model.add(Dense(128))
         model.add(Dense(nActions))
         
 

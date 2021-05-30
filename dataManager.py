@@ -55,6 +55,8 @@ class SingleGym():
         if self.use_preprocess:
             observation = preprocess_frame_karpathy(observation)
             self.lastObservation = observation
+        else:
+            observation = np.array(observation)/255
         return observation
     
     def step(self,action):
@@ -65,6 +67,7 @@ class SingleGym():
             self.lastObservation = observation
             return diff, reward, done, info
         else:
+            observation = np.array(observation)/255
             return observation, reward, done, info
 
         
