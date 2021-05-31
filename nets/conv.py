@@ -24,8 +24,8 @@ class NeuralNetwork(nnBase.NNBase):
         model.add(Conv2D(64, (3, 3), activation='relu',padding='same'))
         model.add((MaxPooling2D(2,2)))
         model.add(Flatten())
-        model.add(Dense(128))
-        model.add(Dense(nActions))
+        model.add(Dense(128,activation="sigmoid") )
+        model.add(Dense(nActions,activation="sigmoid") )
         
 
         model.compile(optimizer=RMSprop(learning_rate=0.0001), loss="binary_crossentropy")
