@@ -54,21 +54,20 @@ class SingleGym():
         observation = self.env.reset()
         if self.use_preprocess:
             observation = preprocess_frame_karpathy(observation)
-            self.lastObservation = observation
         else:
             observation = np.array(observation)/255
+        self.lastObservation = observation
         return observation
     
     def step(self,action):
         observation, reward, done, info = self.env.step(action)
         if self.use_preprocess:
             observation = preprocess_frame_karpathy(observation)
-            diff = observation-self.lastObservation
-            self.lastObservation = observation
-            return diff, reward, done, info
         else:
             observation = np.array(observation)/255
-            return observation, reward, done, info
+        diff = observation-self.lastObservation
+        self.lastObservation = observation
+        return diff, reward, done, info
 
         
 def calculateRewards(rewards,gamma=0.99):
