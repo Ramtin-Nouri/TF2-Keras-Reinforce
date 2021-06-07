@@ -72,6 +72,12 @@ class SingleGym():
         
 def calculateRewards(rewards,gamma=0.99):
     newRewards = []
+    v_t = 0
+    for t in range(len(rewards),0,1):
+        v_t = gamma * v_t + rewards[t]
+        newRewards.append(v_t)
+    newRewards.reverse()
+    """
     for t in range(len(rewards)):
         power = 0
         v_t = 0
@@ -79,7 +85,7 @@ def calculateRewards(rewards,gamma=0.99):
             v_t = v_t + gamma ** power * r
             power += 1
         newRewards.append(v_t)
-        
+    """ 
     #Normalize:
     newRewards = np.array(newRewards)
     newRewards -= np.mean(newRewards)
