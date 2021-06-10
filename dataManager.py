@@ -41,7 +41,7 @@ def preprocess_frame_karpathy(I):
   I[I == 144] = 0 # erase background (background type 1)
   I[I == 109] = 0 # erase background (background type 2)
   I[I != 0] = 1 # everything else (paddles, ball) just set to 1
-  return I.astype(np.float).ravel()
+  return np.expand_dims(I.astype(np.float),axis=2)
 
 
 class SingleGym():
