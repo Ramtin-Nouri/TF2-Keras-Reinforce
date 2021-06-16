@@ -1,37 +1,6 @@
 import os,random,cv2,skimage,numpy as np
 import gym
 
-class MultiGym:
-    def __init__(self, env_id, num_env):
-        self.envs = []
-        for _ in range(num_env):
-            self.envs.append(gym.make(env_id).env)
-
-    def reset(self):
-        obs = []
-        for env in self.envs:
-	        obs.append(env.reset())
-
-    def step(self, actions):
-        obs = []
-        rewards = []
-        dones = []
-        infos = []
-
-        for env, ac in zip(self.envs, actions):
-            ob, rew, done, info = env.step(ac)
-            obs.append(ob)
-            rewards.append(rew)
-            dones.append(done)
-            infos.append(info)
-
-            if done:
-                env.reset()
-	
-        return obs, rewards, dones, infos
-    
-
-
 # preprocessing used by Karpathy (cf. https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5)
 #This feels like cheating tho
 def preprocess_frame_karpathy(I):
@@ -70,24 +39,18 @@ class SingleGym():
         return diff, reward, done, info
 
         
+#Inspired by https://medium.com/@thechrisyoon/deriving-policy-gradients-and-implementing-reinforce-f887949bd63
 def calculateRewards(rewards,gamma=0.99):
     newRewards = []
-    v_t = 0
-    for t in range(len(rewards),0,1):
-        v_t = gamma * v_t + rewards[t]
-        newRewards.append(v_t)
-    newRewards.reverse()
-    """
     for t in range(len(rewards)):
         power = 0
-        v_t = 0
-        for r in rewards[t:]:
-            v_t = v_t + gamma ** power * r
+        newReward = 0
+        for oldReward in rewards[t:]:
+            newReward = v_t + gamma ** power * oldReward
             power += 1
-        newRewards.append(v_t)
-    """ 
+        newRewards.append(newReward)
     #Normalize:
     newRewards = np.array(newRewards)
     newRewards -= np.mean(newRewards)
-    newRewards /= np.std(newRewards)
+    newRewards /= np.std(newRewards)+10**-9 #so we don't divide by 0
     return newRewards
