@@ -1,7 +1,6 @@
-from tensorflow.keras.layers import Dense, Conv2D, Dropout, Multiply, Input, Reshape, Flatten, Lambda, MaxPooling2D, UpSampling2D
-from tensorflow.keras.models import Model, load_model,Sequential
-from tensorflow.keras.optimizers import Adam,RMSprop
-from tensorflow.keras.backend import clip,log
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import RMSprop
 
 import numpy as np
 from tensorflow.python.keras.layers.advanced_activations import Softmax
@@ -10,10 +9,14 @@ from nets import nnBase
 class NeuralNetwork(nnBase.NNBase):
     
     def __init__(self):
-        self.filename = "CNN"
+        #Only sets the name of this class
+        self.networkName = "CNN"
             
     def makeModel(self,inputShape,nActions):
-
+        """
+            overrides base function
+            Create and return a Keras Model
+        """
         model = Sequential()
         model.add(Conv2D(8, (3, 3), activation='relu',padding='same',input_shape=inputShape))
         model.add((MaxPooling2D(2,2)))

@@ -9,7 +9,7 @@ Simple FNN with a 200 neuron Dense Layer
 class NeuralNetwork(nnBase.NNBase):
     
     def __init__(self):
-        self.filename = "SimpleFNN"
+        self.networkName = "SimpleFNN"
         
     def makeModel(self,inputShape,nActions):
         model = Sequential()
