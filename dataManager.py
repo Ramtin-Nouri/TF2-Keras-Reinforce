@@ -16,17 +16,20 @@ class SingleGym():
     """
         Wrapper around actual OpenAi Gym environent with some processing of the observations
     """
-    def __init__(self,env_id,prepro):
+    def __init__(self,env_id,use_preprocessing,use_diff=True):
         """
         Arguments
         ---------
         env_id: str
             Name of the OpenAi Gym Environment
-        prepro: bool
+        use_preprocessing: bool
             Whether observations should be simplified with preprocess_frame_karpathy or not
+        use_diff:
+            Whether the last observation should be subtracted from the current and this results in the outputted observation
         """
         self.env = gym.make(env_id).env
-        self.use_preprocess = prepro
+        self.use_preprocessing = use_preprocessing
+        self.use_diff = use_diff
         self.lastObservation = None
     
     def reset(self):
@@ -41,17 +44,18 @@ class SingleGym():
                 (preprocessed) initial state observation 
         """
         observation = self.env.reset()
-        if self.use_preprocess:
+        if self.use_preprocessing:
             observation = preprocess_frame_karpathy(observation)
         else:
             observation = np.array(observation)/255
-        self.lastObservation = observation
+        if use_diff:
+            self.lastObservation = observation
         return observation
     
     def step(self,action):
         """
             The returned observation of env.step() will be handled the same as reset()
-            At last it will also be subtracted by the last observation before being returned.
+            At last it will also be subtracted by the last observation before being returned (if use_diff is set to True).
             The other returned values from env.step remain unchanged
             
             Arguments
@@ -68,10 +72,12 @@ class SingleGym():
             
         """
         observation, reward, done, info = self.env.step(action)
-        if self.use_preprocess:
+        if self.use_preprocessing:
             observation = preprocess_frame_karpathy(observation)
         else:
             observation = np.array(observation)/255
+        if not use_diff:
+            return observation,reward,done,info
         diff = observation-self.lastObservation
         self.lastObservation = observation
         return diff, reward, done, info
@@ -94,7 +100,7 @@ def calculateRewards(rewards,gamma=0.99):
         power = 0
         newReward = 0
         for oldReward in rewards[t:]: #For each future reward
-            newReward = v_t + gamma ** power * oldReward
+            newReward = newReward + gamma ** power * oldReward
             power += 1
         newRewards.append(newReward)
     #Normalize:
