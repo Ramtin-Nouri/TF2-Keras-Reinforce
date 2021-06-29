@@ -16,7 +16,7 @@ class SingleGym():
     """
         Wrapper around actual OpenAi Gym environent with some processing of the observations
     """
-    def __init__(self,env_id,use_preprocessing,use_diff=True):
+    def __init__(self,env_id,use_preprocessing,use_diff=True,stack=False):
         """
         Arguments
         ---------
@@ -26,11 +26,14 @@ class SingleGym():
             Whether observations should be simplified with preprocess_frame_karpathy or not
         use_diff:
             Whether the last observation should be subtracted from the current and this results in the outputted observation
+        stack:
+            Whether the last and current observation should be stacked as the outputted observation.
         """
         self.env = gym.make(env_id).env
         self.use_preprocessing = use_preprocessing
         self.use_diff = use_diff
         self.lastObservation = None
+        self.stack = stack
     
     def reset(self):
         """
@@ -48,7 +51,7 @@ class SingleGym():
             observation = preprocess_frame_karpathy(observation)
         else:
             observation = np.array(observation)/255
-        if use_diff:
+        if self.use_diff or self.stack:
             self.lastObservation = observation
         return observation
     
@@ -76,8 +79,12 @@ class SingleGym():
             observation = preprocess_frame_karpathy(observation)
         else:
             observation = np.array(observation)/255
-        if not use_diff:
+        if not self.use_diff:
             return observation,reward,done,info
+        if self.stack:
+            stacked = np.stack((observation,lastObservation)).reshape((2*128,))
+            self.lastObservation = observation
+            return stacked ,reward, done, info #TODO: remove magic number
         diff = observation-self.lastObservation
         self.lastObservation = observation
         return diff, reward, done, info
